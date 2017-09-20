@@ -1,10 +1,10 @@
-var path = require('path'),  
-    express = require('express'), 
+var path = require('path'),
+    express = require('express'),
     mongoose = require('mongoose'),
     morgan = require('morgan'),
     bodyParser = require('body-parser'),
     config = require('./config'),
-    listingsRouter = require('../routes/listings.server.routes'), 
+    listingsRouter = require('../routes/listings.server.routes'),
     getCoordinates = require('../controllers/coordinates.server.controller.js');
 
 module.exports.init = function() {
@@ -17,21 +17,56 @@ module.exports.init = function() {
   //enable request logging for development debugging
   app.use(morgan('dev'));
 
-  //body parsing middleware 
+  //body parsing middleware
   app.use(bodyParser.json());
 
   /* server wrapper around Google Maps API to get latitude + longitude coordinates from address */
   app.post('/api/coordinates', getCoordinates, function(req, res) {
     res.send(req.results);
+
+
   });
 
+  app.get('/api/listings', listingsRouter, function(req, res) {
+    res.head(200);
+    res.send(req.results);
+  });
+
+  app.get ('/api/listings/:listingId', listingsRouter, function(req, res) {
+    //console.log(req.results);
+    res.head(200);
+    res.send(req.results);
+  });
+
+  app.put ('/api/listings/:listingId', listingsRouter, function(req, res) {
+    res.head(200);
+    res.send("Done");
+  });
+
+  app.delete ('/api/listings/:listingId', listingsRouter, function(req, res) {
+    //console.log(req.results);
+
+    res.send("Listing Deleted");
+  });
+
+  app.post ('/api/listings/', listingsRouter, function(req, res) {
+    console.log(updated);
+
+    res.send("req.results");
+  });
+
+app.use(express.static('../../client'));
+  app.all('*', function(req, res) {
+    res.sendFile(path.join(__dirname, '../../client', 'index.html'));
+});
+
   /* serve static files */
-  
+
 
   /* use the listings router for requests to the api */
 
 
-  /* go to homepage for all routes not specified */ 
+  /* go to homepage for all routes not specified */
 
   return app;
-};  
+};
